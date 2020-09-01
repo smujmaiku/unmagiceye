@@ -24,7 +24,7 @@ export default function App(): JSX.Element {
 			<AnalyticsProvider>
 				<Unmagic />
 				<div className={classes.branding}>
-					<a href="https://smuj.dev" target="_blank" rel="noreferrer">
+					<a href="https://smuj.dev" target="_blank" rel="noopener noreferrer">
 						<Typography>
 							~ Michael Szmadzinski
 						</Typography>
