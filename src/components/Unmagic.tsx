@@ -7,7 +7,7 @@ const SLANT_MAG = 1000;
 const STRETCH_MAG = 10;
 const validFileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/x-icon'];
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		display: 'flex',
 		flexDirection: 'column',
@@ -20,8 +20,10 @@ const useStyles = makeStyles(() => ({
 		minHeight: '70vh',
 		maxHeight: '70vh',
 	},
+	form: {
+		margin: theme.spacing(0, 1)
+	}
 }));
-
 
 export default function Unmagic(): JSX.Element {
 	const classes = useStyles();
@@ -160,64 +162,65 @@ export default function Unmagic(): JSX.Element {
 					height={height}
 				/>
 			</div>
-			<FormControlLabel
-				control={
-					<Switch
-						checked={auto}
-						onChange={() => setAuto(s => !s)}
-						color="primary"
-					/>
-				}
-				label="Auto"
-			/>
-
-			<FormControl>
-				<InputLabel>Offset Magnitude</InputLabel>
-				<Input
-					type="number"
-					value={offsetMag}
-					onChange={(event) => setOffsetMag(Math.min(100, Math.max(1, parseFloat(event.target.value))))}
+			<div className={classes.form}>
+				<FormControlLabel
+					control={
+						<Switch
+							checked={auto}
+							onChange={() => setAuto(s => !s)}
+							color="primary"
+						/>
+					}
+					label="Auto"
 				/>
-			</FormControl>
-			<Typography gutterBottom>
-				Offset
-			</Typography>
-			<Slider
-				value={offset}
-				onChange={(_, v) => {
-					setOffset(v as number);
-					setAuto(false);
-				}}
-				valueLabelDisplay="auto"
-				marks={[{ value: 0 }]}
-				min={-100}
-				max={100}
-				step={0.1}
-			/>
-			<Typography gutterBottom>
-				Slant
-			</Typography>
-			<Slider
-				value={slant}
-				onChange={(_, v) => setSlant(v as number)}
-				valueLabelDisplay="auto"
-				marks={[{ value: 0 }]}
-				min={-100}
-				max={100}
-				step={1}
-			/>
-			<Typography gutterBottom>
-				Stretch
-			</Typography>
-			<Slider
-				value={stretch}
-				onChange={(_, v) => setStretch(v as number)}
-				valueLabelDisplay="auto"
-				marks={[{ value: 0 }]}
-				min={-100}
-				max={100}
-				step={1}
-			/>
+				<FormControl>
+					<InputLabel>Offset Magnitude</InputLabel>
+					<Input
+						type="number"
+						value={offsetMag}
+						onChange={(event) => setOffsetMag(Math.min(100, Math.max(1, parseFloat(event.target.value))))}
+					/>
+				</FormControl>
+				<Typography gutterBottom>
+					Offset
+				</Typography>
+				<Slider
+					value={offset}
+					onChange={(_, v) => {
+						setOffset(v as number);
+						setAuto(false);
+					}}
+					valueLabelDisplay="auto"
+					marks={[{ value: 0 }]}
+					min={-100}
+					max={100}
+					step={0.1}
+				/>
+				<Typography gutterBottom>
+					Slant
+				</Typography>
+				<Slider
+					value={slant}
+					onChange={(_, v) => setSlant(v as number)}
+					valueLabelDisplay="auto"
+					marks={[{ value: 0 }]}
+					min={-100}
+					max={100}
+					step={1}
+				/>
+				<Typography gutterBottom>
+					Stretch
+				</Typography>
+				<Slider
+					value={stretch}
+					onChange={(_, v) => setStretch(v as number)}
+					valueLabelDisplay="auto"
+					marks={[{ value: 0 }]}
+					min={-100}
+					max={100}
+					step={1}
+				/>
+			</div>
 		</div>
 	);
 }
