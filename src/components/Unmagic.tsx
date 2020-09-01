@@ -57,7 +57,7 @@ export default function Unmagic(): JSX.Element {
 	const [offsetMag, setOffsetMag] = useState(10);
 	const [auto, setAuto] = useState(true);
 	const [offset, setOffset] = useState(0);
-	const [slant, setSlant] = useState(-20);
+	const [slant, setSlant] = useState(0);
 	const [stretch, setStretch] = useState(0);
 
 	useEffect(() => {
