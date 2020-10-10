@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { makeStyles, FormControlLabel, Switch, Slider, FormControl, InputLabel, Input, Typography } from '@material-ui/core';
 import useAnalytics from '../hooks/analytics';
+import CanvasResize from 'react-canvas-resize';
 
 const OFFSET_MAG = 10000;
 const SLANT_MAG = 1000;
@@ -30,17 +31,12 @@ export default function Unmagic(): JSX.Element {
 	const analytics = useAnalytics();
 
 	const logAnalytics = useCallback((name: string, params?: { [key: string]: any; }) => {
-		if (analytics !== null) {
-			analytics.logEvent(name, params);
-		}
-
+		if (analytics === null) return;
+		analytics.logEvent(name, params);
 	}, [analytics])
 
-	const rootRef = useRef<HTMLDivElement>(null);
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-
 	const [imageSrc, setImageSrc] = useState<string | null>(null);
-	const [image, setImage] = useState<CanvasImageSource | null>(null);
+	const [image, setImage] = useState<HTMLImageElement | null>(null);
 	useEffect(() => {
 		if (imageSrc === null) return;
 
@@ -53,16 +49,17 @@ export default function Unmagic(): JSX.Element {
 	}, [imageSrc, logAnalytics])
 
 	const [drag, setDrag] = useState(false);
-	const [[width, height], setSize] = useState([200, 200]);
 	const [offsetMag, setOffsetMag] = useState(10);
 	const [auto, setAuto] = useState(true);
 	const [offset, setOffset] = useState(0);
 	const [slant, setSlant] = useState(0);
 	const [stretch, setStretch] = useState(0);
 
-	useEffect(() => {
-		if (canvasRef.current === null) return;
-		const ctx = canvasRef.current.getContext('2d');
+	const handleDraw = useCallback(({ canvas }) => {
+		if (!canvas) return;
+
+		const { width, height } = canvas;
+		const ctx = canvas.getContext('2d');
 		if (ctx === null) return;
 
 		ctx.clearRect(0, 0, width, height);
@@ -94,7 +91,7 @@ export default function Unmagic(): JSX.Element {
 		ctx.globalCompositeOperation = 'difference';
 		ctx.drawImage(image, -width / 2, -height / 2, width, height);
 		ctx.restore();
-	}, [drag, image, width, height, offset, offsetMag, slant, stretch]);
+	}, [drag, image, offset, offsetMag, slant, stretch])
 
 	useEffect(() => {
 		if (!auto || !imageSrc) return;
@@ -110,19 +107,6 @@ export default function Unmagic(): JSX.Element {
 			cancel = true;
 		}
 	}, [auto, imageSrc]);
-
-	useEffect(() => {
-		const update = () => {
-			if (rootRef.current === null) return;
-
-			const { offsetWidth, offsetHeight } = rootRef.current
-			setSize([offsetWidth, offsetHeight]);
-		}
-		const timer = setInterval(update, 100);
-		return () => {
-			clearInterval(timer);
-		}
-	}, []);
 
 	const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
 		setDrag(false);
@@ -148,20 +132,15 @@ export default function Unmagic(): JSX.Element {
 
 	return (
 		<div className={classes.root}>
-			<div
-				ref={rootRef}
+			<CanvasResize
 				className={classes.container}
+				ratio={[image?.width || 0, image?.height || 0]}
 				onDragOver={(ev) => ev.preventDefault()}
 				onDragEnter={() => setDrag(true)}
 				onDragLeave={() => setDrag(false)}
 				onDrop={handleDrop}
-			>
-				<canvas
-					ref={canvasRef}
-					width={width}
-					height={height}
-				/>
-			</div>
+				onDraw={handleDraw}
+			/>
 			<div className={classes.form}>
 				<FormControlLabel
 					control={
